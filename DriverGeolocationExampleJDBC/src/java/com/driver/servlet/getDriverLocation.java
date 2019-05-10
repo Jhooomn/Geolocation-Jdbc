@@ -12,18 +12,20 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Jhon Baron
  */
-@WebServlet(name = "locationDriver", urlPatterns = {"/locationDriver"})
-public class locationDriver extends HttpServlet {
+@WebServlet(name = "getDriverLocation", urlPatterns = {"/getDriverLocation"})
+public class getDriverLocation extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,20 +41,19 @@ public class locationDriver extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            double latitude = Double.parseDouble(request.getParameter("lat"));
-            double longitude = Double.parseDouble(request.getParameter("lng"));
             int id = Integer.parseInt(request.getParameter("id"));
-            String name = request.getParameter("name");
+            System.out.println("This id was received: " + id);
+            Driver driver_location = DriverImpl.getDriverGeolocation(id);
 
-            System.out.println("id: " + id);
-            System.out.println("Name: " + name);
-            System.out.println("Latitude: " + latitude);
-            System.out.println("Longitude: " + longitude);
-
-            Driver driver = new Driver(id, name, latitude, longitude);
-
-            DriverImpl.updateGeolocation(latitude, longitude, id);
-
+            System.out.println("Id Location: " + driver_location.getId());
+            System.out.println("Name Location: " + driver_location.getName());
+            System.out.println("Lat Location: " + driver_location.getLatitude());
+            System.out.println("Long Location: " + driver_location.getLongitude());
+            
+            HttpSession session = request.getSession();
+            
+            session.setAttribute("driver_location", driver_location);
+            
         }
     }
 
@@ -70,8 +71,10 @@ public class locationDriver extends HttpServlet {
             throws ServletException, IOException {
         try {
             processRequest(request, response);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(locationDriver.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(getDriverLocation.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(getDriverLocation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -88,8 +91,10 @@ public class locationDriver extends HttpServlet {
             throws ServletException, IOException {
         try {
             processRequest(request, response);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(locationDriver.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(getDriverLocation.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(getDriverLocation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

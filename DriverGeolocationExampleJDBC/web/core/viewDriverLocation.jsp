@@ -1,17 +1,16 @@
 <%-- 
-    Document   : driverLocation
-    Created on : 9/05/2019, 09:01:13 PM
+    Document   : viewDriverLocation
+    Created on : 10/05/2019, 09:19:15 AM
     Author     : Jhon Baron
 --%>
 
 <%@page import="com.driver.model.Driver"%>
-<%@page import="com.driver.jdbc.DriverImpl"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Driver Location</title>
+        <title>Get Driver Location</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
@@ -38,28 +37,28 @@
         <!-- Map script Space -->
         <script>
             function showPosition(position) {
-                var map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 17);
                 $.ajax({
-                    url: '../locationDriver',
-
+                    url: '../getDriverLocation',
                     data: {
-                        'lat': position.coords.latitude,
-                        'lng': position.coords.longitude,
-                        'id': <%= driver.getId() %>,
-                        'name': '<%= driver.getName() %>'
+                        'id': <%= driver.getId()%>,
+                        'name': '<%= driver.getName()%>'
                     },
                     type: 'POST',
                     success: function (result) {
-                        // If your backend page sends something back
-//                alert(result);
+                       <% 
+                       Driver driver_location = (Driver) session.getAttribute("driver_location");
+                       %>
+                        var map = L.map('map').setView([<%= driver_location.getLatitude() %>, <%= driver_location.getLongitude() %>], 17);
+                        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+                            maxZoom: 18
+                        }).addTo(map);
+                        L.control.scale().addTo(map);
+                        L.marker([<%=driver_location.getLatitude()%>, <%=driver_location.getLongitude()%>]).addTo(map);
+                        console.log('Latitude by Servlet: <%= driver_location.getLatitude() %>');
+                        console.log('Longitude by Servlet: <%= driver_location.getLongitude()%>');
                     }
                 });
-                L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-                    maxZoom: 18
-                }).addTo(map);
-                L.control.scale().addTo(map);
-                L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
             }
 
             function geo_error() {

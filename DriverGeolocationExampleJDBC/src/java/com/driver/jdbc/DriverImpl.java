@@ -47,6 +47,24 @@ public class DriverImpl {
         pst.executeUpdate();
     }
 
+    public static Driver getDriverGeolocation(int id) throws ClassNotFoundException, SQLException {
+        Connection connect = JdbcConnect.connect();
+
+        PreparedStatement pst = connect.prepareStatement("select "
+                + "* from driver where iddriver = ?");
+        pst.setInt(1, id);
+
+        ResultSet rs = pst.executeQuery();
+        Driver driver = new Driver();
+        while (rs.next()) {
+            driver.setId(rs.getInt(1));
+            driver.setName(rs.getString(2));
+            driver.setLatitude(rs.getDouble(3));
+            driver.setLongitude(rs.getDouble(4));
+        }
+        return driver;
+    }
+
     public static List<Driver> list() {
         List<Driver> listado = new ArrayList<>();
         try {
